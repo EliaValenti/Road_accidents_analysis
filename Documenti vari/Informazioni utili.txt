@@ -1,0 +1,62 @@
+
+CONSIGLI:
+
+-Durante scraping di situas (notebook 00) se il download non è abbastanza veloce, potrebbe dare errore in queste righe:
+
+#Cliccare le sezioni con tempo di ritardo
+import time
+time.sleep(5)
+driver.find_element(By.ID, 'dati-report-export-btn').click() # clicca Esporta
+time.sleep(5)
+driver.find_element(By.XPATH, '//*[@id="dati-report-export-btn-menu"]/li[2]/button[@title="Scarica dati in formato CSV"]').click() # clicca CSV
+
+raw_situas=os.listdir("fetching_data")
+raw_situas
+
+Cella 1--> rieseguire oppure cambiare il tempo di ritardo
+Cella 2--> una volta scaricato il csv rieseguire da qui
+
+
+
+-Il comune di "None" l' ho rinominato come "None." altrimenti veniva letto come carattere nullo
+
+---------------------------------------------------------------------------------------------------
+
+INDICI per ISTAT:
+
+FREQ= frequenza --[A] annuale
+REF_AREA= comuni --- -> ID dei comuni
+DATA_TYPE = indicatore -- [KILLINJ] morti e feriti
+                        [ROADACC] incidenti stradali con lesioni alle persone
+RESULT= esito -- [M] morto [F] ferito [9] totale --da sostituire 
+TIME_PERIOD = Anno di osservazione
+OBS_VALUE= Valori osservati (observed value)
+
+URL UTILI:
+https://esploradati.istat.it/databrowser/#/it/dw/categories/IT1,Z0810HEA,1.0/HEA_ROAD/IT1,41_983_DF_DCIS_INCIDMORFER_COM_1,1.0
+https://ondata.github.io/guida-api-istat/#esempio-3-dati-specifici-palermo-feriti-ultimi-10-record
+
+---------------------------------------------------------------------------------------------------------------
+
+LINK UTILI:
+
+-Incidenti nell' anno 2020 
+https://www.istat.it/comunicato-stampa/incidenti-stradali-in-italia-anno-2020/
+
+-Incidenti Roma 2024
+https://roma.aci.it/notizie-e-informazioni/notizie-ed-eventi/notizia/incidenti-stradali-a-roma-in-aumento-nel-2024-crescono-sinistri-e-feriti-ma-diminuiscono-le-vittim.html
+
+-Incidenti Roma 2023
+https://roma.aci.it/notizie-e-informazioni/notizie-ed-eventi/notizia/rapporto-aci-istat-nel-2023-a-roma-incidenti-in-calo-ma-focus-critico-sugli-utenti-deboli.html
+
+-Incidenti Milano 2023
+https://www.ansa.it/lombardia/notizie/2024/10/14/aci-incidenti-stradali-a-livelli-pre-pandemia-nel-2023-a-milano_c181d049-d9f1-4a39-a85c-221bbcc9e891.html
+
+-Classificazione Comuni per superficie
+https://www.istat.it/it/files/2015/04/Superfici-delle-unit%C3%A0-amministrative-Testo-integrale.pdf
+
+-Classificazione comuni per classe demografica
+https://finanzalocale.interno.gov.it/docum/studi/varie/200707varclass.html#due
+
+-Codici ISTAT delle REGIONI
+https://www.adm.gov.it/portale/documents/20182/900944/Codici+ISTAT+delle+regioni.pdf/1e49f71e-d2a3-4a8c-b250-54e828312f92
