@@ -64,27 +64,41 @@ def plot_distr_logaritmic_scale(df, column):
 def create_municipality_dataset(df, value_col="OBS_VALUE", value_name="INCIDENTI"): #i nomi delle colonne nei parametri vengono utilizzati solo e unicamente
                                                                                     #se non se ne passa uno differente
 
-    # Numero di anni presenti nel dataset
-    n_years = df["TIME_PERIOD"].nunique()
+    # Numero di anni presenti nel periodo di studio
+    tot_period_years = df["TIME_PERIOD"].nunique()
 
-    #Aggregazione dei dati per ogni singolo comune
-    df_municipality = (df.groupby(["ID_COMUNE", "COMUNE"], as_index=False).agg({value_col: "sum",
+    # Numero di anni effettivamente disponibili per ogni singolo comune
+    years_recorded_per_municipality = (df.groupby(["ID_COMUNE", "COMUNE"])["TIME_PERIOD"]
+                              .nunique()
+                              .reset_index(name="N_ANNI")
+                              )
+
+    # Aggregazione dei dati per ogni singolo comune
+    df_municipality = (df.groupby(["ID_COMUNE"], as_index=False).agg({value_col: "sum",
                                                                                 "RESIDENTI": "mean",
                                                                                 "SUPERFICIE (KMQ)": "mean",
                                                                                 "ID_REGIONE": "first",
-                                                                                "REGIONE":"first"}))
+                                                                                "REGIONE": "first"}))
+
+    # Aggiunta del numero di anni effettivamente osservati per ogni comune
+    df_municipality = df_municipality.merge(years_recorded_per_municipality,
+                                            on=["ID_COMUNE", "COMUNE"],how="left",
+                                            validate="one_to_one")
 
     # Rinomina la colonna aggregata
-    df_municipality.rename(columns={value_col: f"{value_name}_TOTALI"},inplace=True)
+    df_municipality.rename(columns={value_col: f"{value_name}_TOTALI"}, inplace=True)
 
-    # Media annuale dell' osservazione
-    df_municipality[f"{value_name}_MEDI_ANNUI"] = (df_municipality[f"{value_name}_TOTALI"] / n_years)
+    # Media annuale dell'osservazione sul periodo complessivo di studio
+    df_municipality[f"{value_name}_MEDI_ANNUI"] = (df_municipality[f"{value_name}_TOTALI"] / tot_period_years)
+
     # Densità popolazione
-    df_municipality["DENSITA_POPOLAZIONE"] = (df_municipality["RESIDENTI"] /df_municipality["SUPERFICIE (KMQ)"])
-    # Densità dell' osservazione
-    df_municipality[f"DENSITA_{value_name}_MEDIA"] = (df_municipality[f"{value_name}_MEDI_ANNUI"]/df_municipality["SUPERFICIE (KMQ)"])
+    df_municipality["DENSITA_POPOLAZIONE"] = (df_municipality["RESIDENTI"]/ df_municipality["SUPERFICIE (KMQ)"])
+
+    # Densità dell'osservazione
+    df_municipality[f"DENSITA_{value_name}_MEDIA"] = (df_municipality[f"{value_name}_MEDI_ANNUI"]/ df_municipality["SUPERFICIE (KMQ)"])
+
     # Osservazione pro capite (1000)
-    df_municipality[f"{value_name}_PRO_CAPITE(1000)_MEDIA"] = (df_municipality[f"{value_name}_MEDI_ANNUI"]/df_municipality["RESIDENTI"]) * 1000
+    df_municipality[f"{value_name}_PRO_CAPITE(1000)_MEDIA"] = (df_municipality[f"{value_name}_MEDI_ANNUI"]/ df_municipality["RESIDENTI"]) * 1000
 
     return df_municipality
 
